@@ -20,7 +20,7 @@ public class DBCTestDriver {
     print("Alrighty, let me make sure everything is in order to start...");
     
     if(dbc == null) { //make sure that we have the connector
-      print("I don't seem to know where the DBConnector is. Sorry.");
+      print("I don't seem to know where the DBConnector is. Sorry. Going home.");
       return -1;
     }
     

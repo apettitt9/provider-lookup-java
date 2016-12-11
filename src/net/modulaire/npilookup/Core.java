@@ -12,8 +12,6 @@ public class Core {
   
   public static void main(String[] args) {
     
-    System.out.println("Hello, world!");
-    
     if(args.length < 3) { //make sure that we are getting something that resembles valid data
       System.out.println("Usage: java -jar <executable.jar> <server_location> <username> <password>");
       System.exit(CLEAN_EXIT);
@@ -23,12 +21,15 @@ public class Core {
       
       dbc = new DBConnector(args[0], args[1], args[2]);
       
+      DBCTestDriver testDriver = new DBCTestDriver();
+      testDriver.runTests();
+      
+      dbc.close();
       
     } catch (ConnectorException e) {
       System.out.println("The application caught a ConnectorException and has to close.");
-      if(e.getCause() != null) {
-        System.out.println("Note that the exception was caused by " + e.getCause().getClass().getSimpleName());
-      }
+      if(e.getMessage() != null) System.out.println("Message: " + e.getMessage());
+      if(e.getCause() != null) System.out.println("Note that the exception was caused by " + e.getCause().getClass().getSimpleName());
       System.exit(DIRTY_EXIT);
     }
     
