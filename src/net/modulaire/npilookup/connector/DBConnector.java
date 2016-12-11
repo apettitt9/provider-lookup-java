@@ -2,6 +2,8 @@ package net.modulaire.npilookup.connector;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DBConnector {
@@ -34,7 +36,49 @@ public class DBConnector {
     
   }
   
-  public void search(int searchType, SearchTerm... searchTerms) {
+  public ResultSet search(SearchTerm... searchTerms) throws ConnectorException {
+    
+    PreparedStatement statement;
+    
+    String query = "SELECT * FROM Provider p"; //assume that we're always going to use the Provider table
+    boolean onNameTable = false,
+            onAddressDataTable = false;
+    
+    for(int i = 0; i < searchTerms.length; i++) {
+      switch(searchTerms[i].getType().getParent()) {
+      case SearchTerm.NAME_TABLE:
+        onNameTable = true;
+        break;
+      case SearchTerm.ADDRESS_DATA_TABLE:
+        onAddressDataTable = true;
+      }
+    }
+    
+    if(onNameTable) query += " INNER JOIN name n ON n.pid = p.pid";
+    if(onAddressDataTable) query += " INNER JOIN address a ON a.provider = p.pid INNER JOIN address_data mad ON mad.adid = a.mailing_address INNER JOIN address_data ON pad ON pad.adid = a.practice_location";
+    
+    query += " WHERE";
+    
+    for(int i = 0; i < searchTerms.length; i++) {
+      if(searchTerms[i].getType() == SearchTerm.SEARCH_BY_NPI) query += " AND p.pid = '" + searchTerms[i].getKey() + "'";
+      if(searchTerms[i].getType() == SearchTerm.SEARCH_BY_FIRST_NAME) query += " AND n.first_name LIKE '%" + searchTerms[i].getKey() + "%'";
+      if(searchTerms[i].getType() == SearchTerm.SEARCH_BY_LAST_NAME) query += " AND n.last_name LIKE '%" + searchTerms[i].getKey() + "%'";
+      if(searchTerms[i].getType() == SearchTerm.SEARCH_BY_ORGANIZATION) query += " AND n.org_business_name LIKE '%" + searchTerms[i].getKey() + "%'";
+      if(searchTerms[i].getType() == SearchTerm.SEARCH_BY_CITY) query += " AND (mad.city LIKE '%" + searchTerms[i].getKey() + "%' OR pad.city LIKE '%" + searchTerms[i].getKey() + "%')";
+      if(searchTerms[i].getType() == SearchTerm.SEARCH_BY_STATE) query += " AND (mad.state ='" + searchTerms[i].getKey() + "' OR pad.state = '" + searchTerms[i].getKey() + "')";
+      if(searchTerms[i].getType() == SearchTerm.SEARCH_BY_COUNTRY) query += " AND (mad.country_code = '" + searchTerms[i].getKey() + "' OR pad.country_code ='" + searchTerms[i].getKey() + "')";
+      if(searchTerms[i].getType() == SearchTerm.SEARCH_BY_POSTAL_CODE) query += " AND (mad.postal_code = '" + searchTerms[i].getKey() + "' OR pad.postal_code ='" + searchTerms[i].getKey() + "')";
+    }
+    
+    query += " LIMIT 100";
+    
+    try {
+      statement = connection.prepareStatement(query);
+      statement.setFetchSize(100);
+      return statement.executeQuery();
+    } catch (SQLException e) {
+      throw new ConnectorException("Exception thrown when building the query.", e);
+    }
     
   }
   
