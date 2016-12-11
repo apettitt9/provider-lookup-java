@@ -16,6 +16,8 @@ public class SearchTerm {
   public static final SearchType SEARCH_BY_STATE = new SearchType(ADDRESS_DATA_TABLE);
   public static final SearchType SEARCH_BY_COUNTRY = new SearchType(ADDRESS_DATA_TABLE);
   public static final SearchType SEARCH_BY_POSTAL_CODE = new SearchType(ADDRESS_DATA_TABLE);
+  
+  private static SearchType[] searchTypes = new SearchType[8];
     
   private SearchType searchType;
   private String searchKey;
@@ -36,6 +38,11 @@ public class SearchTerm {
     return searchKey;
   }
   
+  public static SearchType getTypeFromId(int id) {
+    if(id < 0 || id >= searchTypes.length) return null;
+    return searchTypes[id];
+  }
+  
   public static class SearchType {
     
     private static int instanceCount = 0;
@@ -46,6 +53,7 @@ public class SearchTerm {
     public SearchType(int parentTable) {
       this.id = instanceCount++;
       this.parentTable = parentTable;
+      searchTypes[id] = this;
     }
     
     public int getParent() {
