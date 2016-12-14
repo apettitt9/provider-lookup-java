@@ -2,6 +2,7 @@ package net.modulaire.npilookup;
 
 import java.util.Scanner;
 
+import net.modulaire.npilookup.connector.ConnectorException;
 import net.modulaire.npilookup.connector.DBConnector;
 import net.modulaire.npilookup.connector.SearchTerm;
 import net.modulaire.npilookup.connector.SearchTerm.SearchType;
@@ -36,7 +37,6 @@ public class DBCTestDriver {
     while(true) {
       
       int searchTypeId;
-      SearchType searchType;
       String searchKey;
       
       println("\nHere are your choices:");
@@ -52,20 +52,44 @@ public class DBCTestDriver {
       
       try {
         searchTypeId = Integer.parseInt(keyboard.nextLine());
+        if(searchTypeId < 0 || searchTypeId > 7) continue; 
       } catch(Exception e) {
         println("It appears that invalid text was entered. Please try again.");
         continue;
       }
       
-      searchType = SearchTerm.getTypeFromId(searchTypeId);
+      while(true) {
+        print("Please enter a search word: ");
+        searchKey = keyboard.nextLine();
+        if(!searchKey.equalsIgnoreCase("")) break;
+      }
       
-      print("Please enter a search word: ");
-      searchKey = keyboard.nextLine();
+      println("Attempting to search for '" + searchKey + "' by id " + searchTypeId + ".");
       
+      try {
+        dbc.search(new SearchTerm(SearchTerm.SearchType.getTypeFromId(searchTypeId), searchKey));
+      } catch (ConnectorException e) {
+        println("Something not so great happened when we tried to search.");
+        e.printStackTrace();
+        keyboard.close();
+        return 1;
+      }
       
+      println("Finished searching.");
+      
+      while(true) {
+        String response;
+        print("Would you like to continue? [y/n]: ");
+        response = keyboard.nextLine();
+        if(response.equalsIgnoreCase("y")) break;
+        if(response.equalsIgnoreCase("n")) {
+          keyboard.close();
+          println("Goodbye, friend!");
+          return 0;
+        }
+      }
+
     }
-    
-    //return 0;
     
   }
   
