@@ -3,7 +3,6 @@ package net.modulaire.npilookup.connector;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DBConnector {
@@ -36,28 +35,31 @@ public class DBConnector {
     
   }
   
-  public ResultSet search(SearchTerm... searchTerms) throws ConnectorException {
+  public RetrievedProviders search(SearchTerm... searchTerms) throws ConnectorException {
     
-    PreparedStatement statement;
-    
-    String query = "SELECT * FROM provider p"; //assume that we're always going to use the Provider table
-    boolean onNameTable = false,
-            onAddressDataTable = false;
-    
-    for(int i = 0; i < searchTerms.length; i++) {
-      switch(searchTerms[i].getType().getParent()) {
-      case SearchTerm.NAME_TABLE:
-        onNameTable = true;
-        break;
-      case SearchTerm.ADDRESS_DATA_TABLE:
-        onAddressDataTable = true;
+    /*
+      String query = "SELECT * FROM provider p"; //assume that we're always going to use the Provider table
+
+      boolean onNameTable = false,
+              onAddressDataTable = false;
+
+      for(int i = 0; i < searchTerms.length; i++) {
+        switch(searchTerms[i].getType().getParent()) {
+        case SearchTerm.NAME_TABLE:
+          onNameTable = true;
+          break;
+        case SearchTerm.ADDRESS_DATA_TABLE:
+          onAddressDataTable = true;
+        }
       }
-    }
-    
-    if(onNameTable) query += " INNER JOIN name n ON n.pid = p.pid";
-    if(onAddressDataTable) query += " INNER JOIN address a ON a.provider = p.pid INNER JOIN address_data mad ON mad.adid = a.mailing_address INNER JOIN address_data pad ON pad.adid = a.practice_location";
-    
-    query += " WHERE";
+
+      if(onNameTable) query += " INNER JOIN name n ON n.pid = p.pid";
+      if(onAddressDataTable) query += " INNER JOIN address a ON a.provider = p.pid INNER JOIN address_data mad ON mad.adid = a.mailing_address INNER JOIN address_data pad ON pad.adid = a.practice_location";
+      query += " WHERE";
+    */
+
+    String query = "SELECT * FROM provider p INNER JOIN name n ON n.pid = p.pid INNER JOIN address a ON a.provider = p.pid INNER JOIN address_data mad ON mad.adid = a.mailing_address INNER JOIN address_data pad ON pad.adid = a.practice_location WHERE";
+    PreparedStatement statement;
     
     for(int i = 0; i < searchTerms.length; i++) {
       
@@ -81,7 +83,7 @@ public class DBConnector {
       System.out.println();
       System.out.println(query);
       System.out.println();
-      return statement.executeQuery();
+      return new RetrievedProviders(statement.executeQuery());
     } catch (SQLException e) {
       throw new ConnectorException("Exception thrown when building the query.", e);
     }

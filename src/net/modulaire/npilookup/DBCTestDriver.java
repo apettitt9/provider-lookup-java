@@ -5,7 +5,6 @@ import java.util.Scanner;
 import net.modulaire.npilookup.connector.ConnectorException;
 import net.modulaire.npilookup.connector.DBConnector;
 import net.modulaire.npilookup.connector.SearchTerm;
-import net.modulaire.npilookup.connector.SearchTerm.SearchType;
 
 public class DBCTestDriver {
   
@@ -75,7 +74,9 @@ public class DBCTestDriver {
         return 1;
       }
       
-      println("Finished searching.");
+      println("Finished searching.\n");
+      
+      //TODO get RetrievedProviders object from DBConnector here and display the results
       
       while(true) {
         String response;
