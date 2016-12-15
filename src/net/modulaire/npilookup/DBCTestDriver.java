@@ -2,28 +2,27 @@ package net.modulaire.npilookup;
 
 import java.util.Scanner;
 
-import net.modulaire.npilookup.connector.ConnectorException;
-import net.modulaire.npilookup.connector.DBConnector;
-import net.modulaire.npilookup.connector.SearchTerm;
+import net.modulaire.npilookup.connector.*;
 
 public class DBCTestDriver {
   
-  DBConnector dbc;
+  DBConnector dbConnector;
+  RetrievedProviders retrievedProviders;
 
   public DBCTestDriver() {
     println("Hello there. I'm a driver that tests the database connector.");
   }
   
-  public DBCTestDriver(DBConnector dbc) {
+  public DBCTestDriver(DBConnector dbConnector) {
     super();
-    this.dbc = dbc;
+    this.dbConnector = dbConnector;
     println("Ok, cool, I now know where the database is.");
   }
   
   public int runTests() {
     println("Alrighty, let me make sure everything is in order to start...");
     
-    if(dbc == null) { //make sure that we have the connector
+    if(dbConnector == null) { //make sure that we have the connector
       println("I don't seem to know where the DBConnector is. Sorry. Going home.");
       return -1;
     }
@@ -66,7 +65,7 @@ public class DBCTestDriver {
       println("Attempting to search for '" + searchKey + "' by id " + searchTypeId + ".");
       
       try {
-        dbc.search(new SearchTerm(SearchTerm.SearchType.getTypeFromId(searchTypeId), searchKey));
+        retrievedProviders = dbConnector.search(new SearchTerm(SearchTerm.SearchType.getTypeFromId(searchTypeId), searchKey));
       } catch (ConnectorException e) {
         println("Something not so great happened when we tried to search.");
         e.printStackTrace();
@@ -76,7 +75,12 @@ public class DBCTestDriver {
       
       println("Finished searching.\n");
       
-      //TODO get RetrievedProviders object from DBConnector here and display the results
+      while(retrievedProviders.next()) {
+        for(int i = 0; i < 22; i++) {
+          System.out.println(retrievedProviders.getValue(i));
+        }
+        System.out.println();
+      }
       
       while(true) {
         String response;
