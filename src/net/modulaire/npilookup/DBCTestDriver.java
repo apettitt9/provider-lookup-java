@@ -34,7 +34,7 @@ public class DBCTestDriver {
     
     while(true) {
       
-      int searchTypeId;
+      int searchTypeId, limit;
       String searchKey;
       
       println("\nHere are your choices:");
@@ -62,10 +62,21 @@ public class DBCTestDriver {
         if(!searchKey.equalsIgnoreCase("")) break;
       }
       
+      while(true) {
+        try {
+          print("Please enter a limit: ");
+          limit = Integer.parseInt(keyboard.nextLine());
+          if(limit < 0) continue;
+          break;
+        } catch(Exception e) {
+          continue;
+        }
+      }
+      
       println("Attempting to search for '" + searchKey + "' by id " + searchTypeId + ".");
       
       try {
-        retrievedProviders = dbConnector.search(new SearchTerm(SearchTerm.SearchType.getTypeFromId(searchTypeId), searchKey));
+        retrievedProviders = dbConnector.search(limit, new SearchTerm(SearchTerm.SearchType.getTypeFromId(searchTypeId), searchKey));
       } catch (ConnectorException e) {
         println("Something not so great happened when we tried to search.");
         e.printStackTrace();

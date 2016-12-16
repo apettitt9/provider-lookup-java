@@ -2,20 +2,15 @@ package net.modulaire.npilookup.connector;
 
 public class SearchTerm {
   
-  public static final int PROVIDER_TABLE = 0;
-  public static final int NAME_TABLE = 1;
-  public static final int ADDRESS_DATA_TABLE = 2;
-  //public static final int TAXONOMY_DATA_TABLE = 3; TODO implement this
-  
-  public static SearchType SEARCH_BY_NPI = new SearchType(PROVIDER_TABLE);
-  public static SearchType SEARCH_BY_FIRST_NAME = new SearchType(NAME_TABLE);
-  public static SearchType SEARCH_BY_LAST_NAME = new SearchType(NAME_TABLE);
-  //public static SearchType SEARCH_BY_TAXONOMY_DESCRIPTION = new SearchType(TAXONOMY_DATA_TABLE); TODO implement this
-  public static SearchType SEARCH_BY_ORGANIZATION = new SearchType(NAME_TABLE);
-  public static SearchType SEARCH_BY_CITY = new SearchType(ADDRESS_DATA_TABLE);
-  public static SearchType SEARCH_BY_STATE = new SearchType(ADDRESS_DATA_TABLE);
-  public static SearchType SEARCH_BY_COUNTRY = new SearchType(ADDRESS_DATA_TABLE);
-  public static SearchType SEARCH_BY_POSTAL_CODE = new SearchType(ADDRESS_DATA_TABLE);
+  public static SearchType SEARCH_BY_NPI = new SearchType();
+  public static SearchType SEARCH_BY_FIRST_NAME = new SearchType();
+  public static SearchType SEARCH_BY_LAST_NAME = new SearchType();
+  public static SearchType SEARCH_BY_ORGANIZATION = new SearchType();
+  public static SearchType SEARCH_BY_CITY = new SearchType();
+  public static SearchType SEARCH_BY_STATE = new SearchType();
+  public static SearchType SEARCH_BY_COUNTRY = new SearchType();
+  public static SearchType SEARCH_BY_POSTAL_CODE = new SearchType();
+  //public static SearchType SEARCH_BY_TAXONOMY_DESCRIPTION = new SearchType(); TODO implement this
   
   private SearchType searchType;
   private String searchKey;
@@ -43,18 +38,12 @@ public class SearchTerm {
     private static SearchType[] searchTypes = new SearchType[8];
     
     private int id;
-    private int parentTable;
     
-    public SearchType(int parentTable) {
+    public SearchType() {
       this.id = instanceCount++;
-      this.parentTable = parentTable;
       searchTypes[id] = this;
     }
-    
-    public int getParent() {
-      return parentTable;
-    }
-    
+
     public int getId() {
       return id;
     }

@@ -37,14 +37,12 @@ public class DBConnector {
   }
   
   public RetrievedProviders search(SearchTerm... searchTerms) throws ConnectorException {
-    return search(5, searchTerms);
+    return search(0, searchTerms);
   }
   
   public RetrievedProviders search(int limit, SearchTerm... searchTerms) throws ConnectorException {
     
     //String query = "SELECT * FROM provider p INNER JOIN name n ON n.pid = p.pid INNER JOIN address a ON a.provider = p.pid INNER JOIN address_data mad ON mad.adid = a.mailing_address INNER JOIN address_data pad ON pad.adid = a.practice_location WHERE";
-    
-    if(limit <= 0) throw new ConnectorException("Bad term limit was specified.");
 
     String query = "SELECT p.pid AS " + RetrievedProviders.PROVIDER_IDENTIFIER.getIdentifier() + ", " +
       "n.first_name AS " + RetrievedProviders.FIRST_NAME.getIdentifier() + ", " +
@@ -89,7 +87,7 @@ public class DBConnector {
       if(searchTerms[i].getType() == SearchTerm.SEARCH_BY_POSTAL_CODE) query += " (mad.postal_code = '" + searchTerms[i].getKey() + "' OR pad.postal_code ='" + searchTerms[i].getKey() + "')";
     }
     
-    query += " LIMIT " + limit;
+    if(limit > 0) query += " LIMIT " + limit;
     
     try {
       statement = connection.prepareStatement(query);
