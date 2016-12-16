@@ -20,12 +20,8 @@ public class SearchTerm {
   private SearchType searchType;
   private String searchKey;
   
-  /*
-    @SuppressWarnings("unused")
-    private SearchTerm() { } //let's not call this without arguments
-  */
-  
-  public SearchTerm() { };
+  @SuppressWarnings("unused")
+  private SearchTerm() { } //let's not call this without arguments
   
   public SearchTerm(SearchType searchType, String searchKey) {
     this.searchType = searchType;

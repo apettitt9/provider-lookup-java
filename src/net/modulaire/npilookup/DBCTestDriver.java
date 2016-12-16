@@ -73,11 +73,36 @@ public class DBCTestDriver {
         return 1;
       }
       
-      println("Finished searching.\n");
+      println("Finished searching with " + retrievedProviders.getSize() + " results.");
+      System.out.format("%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s",
+          "[PID]",
+          "[FIRST_NAME]",
+          "[MIDDLE_NAME]",
+          "[LAST_NAME]",
+          "[NAME_PREFIX]",
+          "[NAME_SUFFIX]",
+          "[MAIL FIRST LINE]",
+          "[MAIL SECOND LINE]",
+          "[MAIL CITY]",
+          "[MAIL STATE]",
+          "[MAIL POSTAL CODE]",
+          "[MAIL COUNTRY]",
+          "[MAIL PHONE]",
+          "[MAIL FAX]",
+          "[LOCATION FIRST LINE]",
+          "[LOCATION SECOND LINE]",
+          "[LOCATION CITY]",
+          "[LOCATION STATE]",
+          "[LOCATION POSTAL CODE]",
+          "[LOCATION COUNTRY]",
+          "[LOCATION PHONE]",
+          "[LOCATION FAX]");
+      
+      System.out.println();
       
       while(retrievedProviders.next()) {
-        for(int i = 0; i < 22; i++) {
-          System.out.println(retrievedProviders.getValue(i));
+        for(int i = 0; i < RetrievedProviders.ResultType.getInstanceCount(); i++) {
+          System.out.format("%20s", retrievedProviders.getValue(i));
         }
         System.out.println();
       }

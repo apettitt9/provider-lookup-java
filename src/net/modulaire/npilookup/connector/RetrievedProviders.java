@@ -2,13 +2,14 @@ package net.modulaire.npilookup.connector;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class RetrievedProviders {
   
   public static final ResultType PROVIDER_IDENTIFIER = new ResultType("pid");
   public static final ResultType FIRST_NAME = new ResultType("first_name");
   public static final ResultType MIDDLE_NAME = new ResultType("middle_name");
-  public static final ResultType LAST_NAME = new ResultType("last");
+  public static final ResultType LAST_NAME = new ResultType("last_name");
   public static final ResultType NAME_PREFIX = new ResultType("prefix");
   public static final ResultType NAME_SUFFIX = new ResultType("suffix");
   public static final ResultType MAILING_ADDRESS_FIRST_LINE = new ResultType("mafirst");
@@ -23,35 +24,29 @@ public class RetrievedProviders {
   public static final ResultType PRACTICE_LOCATION_SECOND_LINE = new ResultType("plsecond");
   public static final ResultType PRACTICE_LOCATION_CITY = new ResultType("plcity");
   public static final ResultType PRACTICE_LOCATION_STATE = new ResultType("plstate");
+  public static final ResultType PRACTICE_LOCATION_POSTAL_CODE = new ResultType("plpostal");
   public static final ResultType PRACTICE_LOCATION_COUNTRY_CODE = new ResultType("plcountry");
   public static final ResultType PRACTICE_LOCATION_PHONE_NUMBER = new ResultType("plphone");
   public static final ResultType PRACTICE_LOCATION_FAX_NUMBER = new ResultType("plfax");
-  public static final ResultType MAIN_TAXONOMY_TYPE = new ResultType("taxonomy");
   
   private int cursor;
   private int size;
-  private String[][] results;
+  private ArrayList<String[]> results;
 
   public RetrievedProviders(ResultSet resultSet) throws ConnectorException {
     
     cursor = -1;
-    
+    size = 0;
+    results = new ArrayList<String[]>();
+
     try {
-      resultSet.last();
-      size = resultSet.getRow();
-      resultSet.beforeFirst();
-    } catch (SQLException e) {
-      size = 0;
-    }
-    
-    try {
-      if(size > 0) {
-        results = new String[size][22];
-        for(int i = 0; i < size; i++) {
-          for(int j = 0; j < 22; j++) {
-            results[i][j] = resultSet.getString(ResultType.getIdentifier(j));
-          }
+      while(resultSet.next()) {
+        String[] line = new String[ResultType.getInstanceCount()];
+        for(int i = 0; i < ResultType.getInstanceCount(); i++) {
+          line[i] = resultSet.getString(ResultType.getIdentifier(i));
         }
+        size++;
+        results.add(line);
       }
     } catch(SQLException e) {
       throw new ConnectorException("Issue occurred when building the RetrievedProviders double array.", e);
@@ -64,9 +59,13 @@ public class RetrievedProviders {
   }
   
   public boolean next() {
-    if(cursor >= size) return false;
+    if(cursor + 1 >= size || size <= 1) return false;
     cursor++;
     return true;
+  }
+  
+  public int getSize() {
+    return size;
   }
   
   public String getValue(ResultType resultType) {
@@ -74,15 +73,15 @@ public class RetrievedProviders {
   }
   
   public String getValue(int index) {
-    if(cursor >= size || index < 0 || index > 22) return null;
-    return results[cursor][index];
+    if(cursor >= size || index < 0 || index > ResultType.getInstanceCount()) return null;
+    return results.get(cursor)[index];
   }
   
   public static class ResultType {
     
     private static int instanceCount = 0;
     
-    private static ResultType[] resultTypes = new ResultType[22];
+    private static ArrayList<ResultType> resultTypes = new ArrayList<ResultType>();
     
     private int id;
     private String identifier;
@@ -90,7 +89,7 @@ public class RetrievedProviders {
     public ResultType(String identifier) {
       this.id = instanceCount++;
       this.identifier = identifier;
-      resultTypes[id] = this;
+      resultTypes.add(this);
     }
     
     public int getId() {
@@ -103,7 +102,11 @@ public class RetrievedProviders {
     
     public static String getIdentifier(int i) {
       if(i < 0 || i >= instanceCount) return null;
-      return resultTypes[i].getIdentifier();
+      return resultTypes.get(i).getIdentifier();
+    }
+    
+    public static int getInstanceCount() {
+      return instanceCount;
     }
     
   }
