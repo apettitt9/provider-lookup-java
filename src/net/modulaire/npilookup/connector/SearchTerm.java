@@ -10,7 +10,6 @@ public class SearchTerm {
   public static SearchType SEARCH_BY_STATE = new SearchType();
   public static SearchType SEARCH_BY_COUNTRY = new SearchType();
   public static SearchType SEARCH_BY_POSTAL_CODE = new SearchType();
-  //public static SearchType SEARCH_BY_TAXONOMY_DESCRIPTION = new SearchType(); TODO implement this
   
   private SearchType searchType;
   private String searchKey;

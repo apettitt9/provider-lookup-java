@@ -41,8 +41,6 @@ public class DBConnector {
   }
   
   public RetrievedProviders search(int limit, SearchTerm... searchTerms) throws ConnectorException {
-    
-    //String query = "SELECT * FROM provider p INNER JOIN name n ON n.pid = p.pid INNER JOIN address a ON a.provider = p.pid INNER JOIN address_data mad ON mad.adid = a.mailing_address INNER JOIN address_data pad ON pad.adid = a.practice_location WHERE";
 
     String query = "SELECT p.pid AS " + RetrievedProviders.PROVIDER_IDENTIFIER.getIdentifier() + ", " +
       "n.first_name AS " + RetrievedProviders.FIRST_NAME.getIdentifier() + ", " +
