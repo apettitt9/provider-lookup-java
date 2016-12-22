@@ -28,7 +28,7 @@ public class Core {
       
       dbc = new DBConnector(args[0], args[1], args[2]);
       
-      DBCTestDriver testDriver = new DBCTestDriver();
+      DBCTestDriver testDriver = new DBCTestDriver(dbc);
       testDriver.runTests();
       
       dbc.close();

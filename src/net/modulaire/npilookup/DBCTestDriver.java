@@ -2,28 +2,27 @@ package net.modulaire.npilookup;
 
 import java.util.Scanner;
 
-import net.modulaire.npilookup.connector.DBConnector;
-import net.modulaire.npilookup.connector.SearchTerm;
-import net.modulaire.npilookup.connector.SearchTerm.SearchType;
+import net.modulaire.npilookup.connector.*;
 
 public class DBCTestDriver {
   
-  DBConnector dbc;
+  DBConnector dbConnector;
+  RetrievedProviders retrievedProviders;
 
   public DBCTestDriver() {
     println("Hello there. I'm a driver that tests the database connector.");
   }
   
-  public DBCTestDriver(DBConnector dbc) {
+  public DBCTestDriver(DBConnector dbConnector) {
     super();
-    this.dbc = dbc;
+    this.dbConnector = dbConnector;
     println("Ok, cool, I now know where the database is.");
   }
   
   public int runTests() {
     println("Alrighty, let me make sure everything is in order to start...");
     
-    if(dbc == null) { //make sure that we have the connector
+    if(dbConnector == null) { //make sure that we have the connector
       println("I don't seem to know where the DBConnector is. Sorry. Going home.");
       return -1;
     }
@@ -35,8 +34,7 @@ public class DBCTestDriver {
     
     while(true) {
       
-      int searchTypeId;
-      SearchType searchType;
+      int searchTypeId, limit;
       String searchKey;
       
       println("\nHere are your choices:");
@@ -52,20 +50,87 @@ public class DBCTestDriver {
       
       try {
         searchTypeId = Integer.parseInt(keyboard.nextLine());
+        if(searchTypeId < 0 || searchTypeId > 7) continue; 
       } catch(Exception e) {
         println("It appears that invalid text was entered. Please try again.");
         continue;
       }
       
-      searchType = SearchTerm.getTypeFromId(searchTypeId);
+      while(true) {
+        print("Please enter a search word: ");
+        searchKey = keyboard.nextLine();
+        if(!searchKey.equalsIgnoreCase("")) break;
+      }
       
-      print("Please enter a search word: ");
-      searchKey = keyboard.nextLine();
+      while(true) {
+        try {
+          print("Please enter a limit: ");
+          limit = Integer.parseInt(keyboard.nextLine());
+          if(limit < 0) continue;
+          break;
+        } catch(Exception e) {
+          continue;
+        }
+      }
       
+      println("Attempting to search for '" + searchKey + "' by id " + searchTypeId + ".");
       
+      try {
+        retrievedProviders = dbConnector.search(limit, new SearchTerm(SearchTerm.SearchType.getTypeFromId(searchTypeId), searchKey));
+      } catch (ConnectorException e) {
+        println("Something not so great happened when we tried to search.");
+        e.printStackTrace();
+        keyboard.close();
+        return 1;
+      }
+      
+      println("Finished searching with " + retrievedProviders.getSize() + " results.");
+      System.out.format("%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s%20s",
+          "[PID]",
+          "[FIRST_NAME]",
+          "[MIDDLE_NAME]",
+          "[LAST_NAME]",
+          "[NAME_PREFIX]",
+          "[NAME_SUFFIX]",
+          "[MAIL FIRST LINE]",
+          "[MAIL SECOND LINE]",
+          "[MAIL CITY]",
+          "[MAIL STATE]",
+          "[MAIL POSTAL CODE]",
+          "[MAIL COUNTRY]",
+          "[MAIL PHONE]",
+          "[MAIL FAX]",
+          "[LOCATION FIRST LINE]",
+          "[LOCATION SECOND LINE]",
+          "[LOCATION CITY]",
+          "[LOCATION STATE]",
+          "[LOCATION POSTAL CODE]",
+          "[LOCATION COUNTRY]",
+          "[LOCATION PHONE]",
+          "[LOCATION FAX]");
+      
+      System.out.println();
+      
+      while(retrievedProviders.next()) {
+        for(int i = 0; i < RetrievedProviders.ResultType.getInstanceCount(); i++) {
+          System.out.format("%20s", retrievedProviders.getValue(i));
+        }
+        System.out.println();
+      }
+      
+      while(true) {
+        String response;
+        print("Would you like to continue? [y/n]: ");
+        response = keyboard.nextLine();
+        if(response.equalsIgnoreCase("y")) break;
+        if(response.equalsIgnoreCase("n")) {
+          keyboard.close();
+          println("Goodbye, friend!");
+          return 0;
+        }
+      }
+
     }
-    
-    //return 0;
     
   }
   
